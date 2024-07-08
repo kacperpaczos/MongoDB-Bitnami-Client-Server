@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  # mongodb:
+  #   build:
+  #     context: ./MongoDB
+  #     dockerfile: Dockerfile
+  #   container_name: mongodb
+  #   environment:
+  #     MONGODB_ROOT_USER: admin
+  #     MONGODB_ROOT_PASSWORD: admin
+  #   ports:
+  #     - "27017:27017"
+  #   volumes:
+  #     - ./data/db:/data/db
+  #     - ./init-db.d:/docker-entrypoint-initdb.d
+  #   networks:
+  #     - mongo-network
+
+  mongo-server:
+    image: your_server_image:latest
+    container_name: mongo-server
+    depends_on:
+      - mongodb
+    environment:
+      DB_HOST: mongodb
+      DB_USER: admin
+      DB_PASSWORD: admin
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./server:/app
+    networks:
+      - mongo-network
+
+  mongo-client:
+    image: your_client_image:latest
+    container_name: mongo-client
+    depends_on:
+      - mongo-server
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./client:/app
+    networks:
+      - mongo-network
+
+networks:
+  mongo-network:
+    driver: bridge
